@@ -1,0 +1,11 @@
+{
+  "name": "redbuddy",
+  "version": "0.1.0",
+  "private": true,
+  "description": "RedBuddy 小红书洞察工具（本地代理 + 单页前端）",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "_dependencies说明": "内容获取已全部改走数据源接口，不再需要 playwright-core（本机浏览器采集已移除）。如需用它做别的自动化，自行 npm install playwright-core 并下载 Chromium。",
+  "dependencies": {}
+}

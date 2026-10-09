@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RedBuddy 小红书洞察工具 · 一页纸</title>
+<style>
+  :root{
+    --ink:#1b1f24;      --ink2:#4a5560;   --ink3:#78838f;
+    --line:#e3e7ec;     --bg:#ffffff;     --soft:#f6f8fa;
+    --accent:#c0392b;   --accent-soft:#fdf2f0;
+    --blue:#2f6fb0;     --green:#1f8a5c;  --amber:#a8730b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#eef1f4;color:var(--ink)}
+  body{
+    font:12px/1.55 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .sheet{
+    width:210mm; min-height:297mm; margin:16px auto; padding:12mm 14mm 10mm;
+    background:var(--bg); box-shadow:0 2px 16px rgba(20,30,45,.13);
+  }
+
+  /* ---------- 页眉 ---------- */
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+         padding-bottom:8px;border-bottom:2px solid var(--ink)}
+  h1{margin:0;font-size:21px;letter-spacing:-.4px;font-weight:700}
+  h1 small{display:block;font-size:11px;font-weight:400;color:var(--ink3);letter-spacing:0;margin-top:3px}
+  .meta{text-align:right;font-size:10.5px;color:var(--ink3);white-space:nowrap;line-height:1.5}
+
+  h2{font-size:11.5px;margin:9px 0 5px;padding-left:8px;border-left:3px solid var(--accent);
+     letter-spacing:.4px;font-weight:700}
+  h2 span{font-weight:400;color:var(--ink3);letter-spacing:0;font-size:10.5px;margin-left:6px}
+
+  p{margin:0 0 5px}
+  .lead{font-size:12.5px;color:var(--ink2)}
+  code{font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+       background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:1px 4px;color:#2b3440}
+  b{font-weight:650}
+
+  /* ---------- 架构 ---------- */
+  .arch{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px}
+  .box{border:1px solid var(--line);border-radius:7px;padding:7px 9px;background:var(--soft)}
+  .box .t{font-weight:650;font-size:11.5px;display:flex;align-items:center;gap:6px}
+  .box .f{font:10.5px ui-monospace,Menlo,monospace;color:var(--accent)}
+  .box .d{font-size:11px;color:var(--ink2);margin-top:3px;line-height:1.5}
+
+  /* ---------- 流程 ---------- */
+  .flow{display:flex;align-items:stretch;gap:0;margin:2px 0 0}
+  .step{flex:1;border:1px solid var(--line);border-radius:7px;padding:6px 7px;background:#fff;position:relative}
+  .step+.step{margin-left:16px}
+  .step+.step::before{content:"";position:absolute;left:-13px;top:50%;width:10px;height:1px;background:var(--ink3)}
+  .step+.step::after{content:"";position:absolute;left:-5px;top:50%;transform:translateY(-50%);
+    border-left:5px solid var(--ink3);border-top:3.5px solid transparent;border-bottom:3.5px solid transparent}
+  .step .n{font-size:9.5px;color:var(--ink3);letter-spacing:.5px}
+  .step .t{font-weight:650;font-size:11px;margin-top:1px}
+  .step .d{font-size:10px;color:var(--ink2);margin-top:2px;line-height:1.4}
+  .cost{font-size:9.5px;margin-top:3px;display:inline-block;padding:1px 5px;border-radius:3px}
+  .c-free{background:#e9f6ef;color:var(--green)}
+  .c-svc{background:var(--accent-soft);color:var(--accent)}
+
+  /* ---------- 表格 ---------- */
+  table{width:100%;border-collapse:collapse;font-size:11px}
+  th,td{text-align:left;padding:3.5px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--soft);font-weight:650;color:var(--ink2);font-size:10.5px}
+  td:first-child{white-space:nowrap;font-weight:600}
+  tr:last-child td{border-bottom:none}
+
+  /* ---------- 两栏 ---------- */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
+  ul{margin:0;padding-left:15px}
+  li{margin:1.5px 0;font-size:11px;color:var(--ink2)}
+  li b{color:var(--ink)}
+
+  .tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:10px;
+       background:var(--soft);border:1px solid var(--line);color:var(--ink2);margin:0 4px 4px 0}
+
+  footer{margin-top:8px;padding-top:6px;border-top:1px solid var(--line);
+         font-size:10px;color:var(--ink3);display:flex;justify-content:space-between;gap:12px}
+
+  @media print{
+    html,body{background:#fff}
+    .sheet{margin:0;box-shadow:none;width:auto;min-height:0;padding:10mm 12mm}
+    @page{size:A4;margin:0}
+  }
+  @media (max-width:820px){
+    .sheet{width:auto;margin:0;padding:18px;box-shadow:none}
+    .arch,.cols{grid-template-columns:1fr}
+    .flow{flex-direction:column}
+    .step+.step{margin:10px 0 0}
+    .step+.step::before{left:16px;top:-9px;width:1px;height:8px}
+    .step+.step::after{left:16px;top:-2px;transform:translateX(-50%) rotate(90deg)}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header>
+    <h1>RedBuddy · 小红书洞察工具
+      <small>本地运行 · 零依赖 · 密钥不出本机 —— 一页纸说明</small>
+    </h1>
+    <div class="meta">
+      更新 2026-10-06<br />
+      <span style="color:var(--ink2)">http://127.0.0.1:8090</span>
+    </div>
+  </header>
+
+  <h2>它是什么<span>一句话</span></h2>
+  <p class="lead">
+    贴一条小红书分享短链，<b>自动</b>取回笔记原文（标题 / 正文 / 配图 / 互动数），视频笔记再转出口播逐字稿，
+    然后交给 Agnes 出一份 <b>8 节结构化拆解报告</b>，并自动存进本机的「拆解库」。
+    整个过程在一台 Mac 上跑，<b>没有登录、没有扫码、没有云端账号</b>。
+  </p>
+  <p style="font-size:11.5px;color:var(--ink3)">
+    定位：给自己用的选题 / 文案复盘工具。不是批量采集器。
+  </p>
+
+  <h2>架构<span>4 个文件，零第三方依赖</span></h2>
+  <div class="arch">
+    <div class="box">
+      <div class="t">本地代理 <span class="f">server.js</span></div>
+      <div class="d">HTTP 路由、Agnes 调用与 JSON 自愈解析、托管前端页。<b>不持有任何密钥</b>，Key 由前端随请求带上来。</div>
+    </div>
+    <div class="box">
+      <div class="t">内容获取 <span class="f">collector.cjs</span></div>
+      <div class="d">短链 → 笔记原文；视频 → 服务端转写（提交 ASR 任务后轮询结果）。</div>
+    </div>
+    <div class="box">
+      <div class="t">数据源适配 <span class="f">providers.cjs</span></div>
+      <div class="d">把厂商接口差异收敛成统一结构。换厂商只改一处；含短链展开、错误码翻译、页面兜底。</div>
+    </div>
+    <div class="box">
+      <div class="t">网络真因 <span class="f">neterr.cjs</span></div>
+      <div class="d">把 <code>fetch failed</code> 还原成真因（DNS / TLS 证书 / 拒绝连接 / 超时），全站报错文案统一走它。</div>
+    </div>
+  </div>
+  <p style="font-size:11px;color:var(--ink3);margin-top:6px">
+    前端是单个自包含的 <code>index.html</code>，无构建步骤；配置在 <code>config.local.json</code>（<b>不含密钥</b>）。
+  </p>
+
+  <h2>一次「解析」背后发生了什么<span>每一步走到哪个服务</span></h2>
+  <div class="flow">
+    <div class="step">
+      <div class="n">01</div><div class="t">校验 + 展开短链</div>
+      <div class="d">抠出链接、展开 xhslink 短链，拿到完整笔记地址</div>
+      <div class="cost c-free">只用本机</div>
+    </div>
+    <div class="step">
+      <div class="n">02</div><div class="t">取笔记原文</div>
+      <div class="d">RedFox 解析作品 + 查作品详情（未收录则降级 + 页面兜底）</div>
+      <div class="cost c-svc">红狐 · 送 200 积分</div>
+    </div>
+    <div class="step">
+      <div class="n">03</div><div class="t">视频转写</div>
+      <div class="d">视频笔记才走：提交任务 → 轮询 → 口播逐字稿</div>
+      <div class="cost c-svc">红狐 · 送 200 积分</div>
+    </div>
+    <div class="step">
+      <div class="n">04</div><div class="t">Agnes 拆解</div>
+      <div class="d">8 节结构化报告（封面 / 标题 / 正文 / 标签 / 互动 / 爆款因子 / 风险 / 需求）</div>
+      <div class="cost c-svc">Agnes · 邮箱注册免费用</div>
+    </div>
+  </div>
+
+  <h2>两个账号怎么注册<span>都只要邮箱</span></h2>
+  <div class="cols">
+    <div>
+      <table>
+        <tr><th>账号</th><th>怎么用</th></tr>
+        <tr><td>Agnes AI</td><td><b>邮箱注册</b>即可，注册完就能免费使用大模型生成图片和文案</td></tr>
+        <tr><td>红狐数据 RedFox</td><td><b>邮箱注册送 200 积分</b>；用完了换个新邮箱再注册一个，可以一直用</td></tr>
+        <tr><td>本机运行 / 存储</td><td>免费，数据不出本机</td></tr>
+      </table>
+    </div>
+    <div>
+      <ul>
+        <li><b>密钥配多个 + 顺序轮换</b>：注册了几个邮箱就填几个 Key，一个用完了自动换下一个。</li>
+        <li><b>离线自检</b>：<code>config.local.json</code> 里把 <code>xhsProvider</code> 改成 <code>mock</code>，
+            不联网跑通整条链路（改完记得改回 <code>redfox</code>）。</li>
+        <li><b>明显无效的输入会被提前拦下</b>，不会白跑一次调用。</li>
+        <li><b>拆解库点开不重跑模型</b>，回看报告不会重复调用。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>能力边界<span>先知道，少踩坑</span></h2>
+  <div class="cols">
+    <div>
+      <ul>
+        <li><b>只有红狐一家数据源</b>，没有备用；它挂了就只能用 mock。</li>
+        <li><b>视频笔记拿不到配图</b> —— 红狐对视频只给无水印直链，图片列表为空；报告里「配图」区只对图文笔记展示。</li>
+        <li><b>分享链接的 token 会失效</b>，取不到就在 App 里重新复制一次链接。</li>
+      </ul>
+    </div>
+    <div>
+      <ul>
+        <li><b>转写失败多是上游抽风</b>，同一链接时好时坏、有几分钟窗口期，重试即可。</li>
+        <li><b>密钥只在浏览器里</b>，换浏览器 / 清缓存要重新配；服务端永远不落盘。</li>
+        <li><b>仅供个人分析</b>，勿批量采集或二次分发他人内容。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>本轮改动<span>2026-10-06</span></h2>
+  <div class="cols">
+    <div>
+      <ul>
+        <li><b>清理</b>：移走 <code>node_modules</code>（只含已弃用的 playwright-core，13M）、
+            空的 <code>package-lock.json</code>、空的 <code>.tmp/</code>、
+            以及已移除功能的 <code>design/note-analysis</code> 设计稿（204K）。全部进废纸篓，可恢复。</li>
+        <li><b>瘦身</b>：<code>collector.cjs</code> 去掉未使用的解构变量、两个空实现函数、一个死字段。</li>
+        <li><b>存链</b>：拆解库记录里补存当初粘贴的<b>分享短链</b> —— 卡片可复制、报告页可打开、搜索可直接粘短链命中（直链过期时靠它重新解析）。</li>
+      </ul>
+    </div>
+    <div>
+      <ul>
+        <li><b>修正</b>：<code>struct[].desc</code> 被静默截到 60 字（本意 240 字）—— 重复 clamp 导致，已修。</li>
+        <li><b>合并</b>：<code>providers.cjs</code> 里两个值完全相同的 UA 常量；导出面收窄到真正被用的三个。</li>
+        <li><b>整理</b>：调试落盘从项目目录改到系统临时目录，项目目录不再被写脏。</li>
+        <li><b>修视频</b>：小红书 CDN 检查 Referer 导致黑屏 —— 页面加 <code>no-referrer</code>，另加本机媒体代理兜底 + 失败原因可见化。</li>
+        <li><b>竖进度</b>：三步进度条改竖排、居中，跑动时浮在屏幕正中央。</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <span>RedBuddy · 本地小红书洞察工具</span>
+    <span>密钥只在浏览器 localStorage ｜ 服务端不读环境变量、不落盘</span>
+  </footer>
+
+</div>
+</body>
+</html>
